@@ -5,12 +5,11 @@ trigger accountsRelatedContacts on Contact (after insert, after update, after de
 				for (Contact con:trigger.new) {
 						accIds.add(con.AccountId);
 				}
-				List<Account> accountsRelatedContacts = [Select Id, Name,(Select Id from Contacts) 
-														  From Account Where Id in:accIds];
+				List<Account> accountsRelatedContacts = [Select Id, Name,(Select Id from Contacts) From Account Where Id in:accIds];
 				for(Account sc :accountsRelatedContacts){
 					List<Contact> s =sc.Contacts;
 					System.debug('No. of Contacts: '+ s.size());
-					sc.Number_Of_Contacts__c	 = s.size();
+					sc.Number_Of_Contacts__c= s.size();
 					accListtoUpdate.add(sc);
 				}
 				if(accListtoUpdate.size() > 0){
