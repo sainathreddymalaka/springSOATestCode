@@ -1,0 +1,20 @@
+trigger accountsRelatedContacts on Contact (after insert, after update, after delete){
+			Set<Id> accIds= new Set<Id>();
+			List<Account> accListtoUpdate = new List<Account>();
+			if(Trigger.isInsert || Trigger.isUpdate || Trigger.isDelete){
+				for (Contact con:trigger.new) {
+						accIds.add(con.AccountId);
+				}
+				List<Account> accountsRelatedContacts = [Select Id, Name,(Select Id from Contacts) 
+														  From Account Where Id in:accIds];
+				for(Account sc :accountsRelatedContacts){
+					List<Contact> s =sc.Contacts;
+					System.debug('No. of Contacts: '+ s.size());
+					sc.Number_Of_Contacts__c	 = s.size();
+					accListtoUpdate.add(sc);
+				}
+				if(accListtoUpdate.size() > 0){
+					Update accountsRelatedContacts;
+				}
+			}
+		}
