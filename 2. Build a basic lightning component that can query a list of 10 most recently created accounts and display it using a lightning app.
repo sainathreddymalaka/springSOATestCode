@@ -1,0 +1,59 @@
+-------------------------- HTML ---------------------------------
+<template>
+	<lightning-card title="Test Code | Spring SOA">
+		<div class="slds-m-around_medium">
+			<lightning-datatable columns={columns} data={data} hide-checkbox-column="true" key-field="id">
+			</lightning-datatable>
+		</div>
+	</lightning-card>
+</template>
+
+-------------------------- JS ---------------------------------
+import { LightningElement, wire } from 'lwc';
+// importing accounts
+import getAccounts from '@salesforce/apex/AccountDataController.getAccounts';
+// datatable columns
+const cols = [
+    {label: 'Name',fieldName: 'Name'}, 
+    {label: 'Phone',fieldName: 'Phone',type: 'phone'}, 
+    {label: 'Email',fieldName: 'Email__c'}, 
+    {label: 'Number of Contacts',fieldName: 'Number_Of_Contacts__c'}, 
+    {label: 'Company',fieldName: 'Comapny__c'},
+];
+export default class SpringSOAInterviewTest extends LightningElement {
+    data;
+    error;
+    columns = cols;
+    @wire(getAccounts) wiredAccounts ({ error, data }) {
+    if(data){
+        this.data=data;
+    }
+    else if(error){
+        this.error=error;
+    }
+}
+}
+
+-------------------------- XML ---------------------------------
+
+<?xml version="1.0"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+	<apiVersion>57.0</apiVersion>
+	<isExposed>true</isExposed>
+	<description>Build component, query a list of 10 most recently created accounts and display using lightning app</description>
+	<targets>
+		<target>lightning__RecordPage</target>
+		<target>lightning__AppPage</target>
+		<target>lightning__HomePage</target>
+		<target>lightning__Tab</target>
+	</targets>
+</LightningComponentBundle>
+
+-------------------------- APEX class ---------------------------------
+
+public with sharing class AccountDataController {
+    @AuraEnabled (cacheable=true)
+    public static List<Account> getAccounts(){
+        return [SELECT Name, Phone, Email__c,Number_Of_Contacts__c,Comapny__c FROM Account ORDER BY createdDate DESC LIMIT 10];
+        }
+}
